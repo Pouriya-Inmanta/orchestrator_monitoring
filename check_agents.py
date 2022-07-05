@@ -19,7 +19,13 @@ nagios_codes = ["OK", "WARNING", "CRITICAL", "UNKNOWN"]
 
 def assert_agents_up(base_url, env):
     response = requests.get(base_url + "api/v2/agents", headers={"X-Inmanta-tid": env})
-    response.raise_for_status()
+
+    if response.status_code != 200:
+        _exit(
+            Status.CRITICAL,
+            f"Received HTTP code {response.status_code} while connecting to {base_url}",
+        )
+
     data = response.json()["data"]
     paused = {a["name"] for a in data if a["paused"]}
     down = {a["name"] for a in data if a["status"] != "up"}

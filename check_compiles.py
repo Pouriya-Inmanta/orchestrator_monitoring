@@ -27,7 +27,12 @@ def failed_exporting_compiles(base_url, env):
         headers={"X-Inmanta-tid": env},
     )
 
-    response.raise_for_status()
+    if response.status_code != 200:
+        _exit(
+            Status.CRITICAL,
+            f"Received HTTP code {response.status_code} while connecting to {base_url}",
+        )
+
     data = response.json()["data"]
     failed = [x["id"] for x in data if x["do_export"]]
 
