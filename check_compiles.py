@@ -31,11 +31,13 @@ def failed_exporting_compiles(base_url, env):
     data = response.json()["data"]
     failed = [x["id"] for x in data if x["do_export"]]
 
-    for cid in failed:
-        _exit(
-            Status.CRITICAL,
-            f"Compile failed: {base_url}console/compilereports/{cid}?env={env}",
-        )
+    if failed:
+        for cid in failed:
+            _exit(
+                Status.CRITICAL,
+                f"Compile failed: {base_url}console/compilereports/{cid}?env={env}",
+            )
+    _exit(Status.OK, f"All compiles are succeeding")
 
 
 def _exit(code=Status.OK, msg="No errors"):
